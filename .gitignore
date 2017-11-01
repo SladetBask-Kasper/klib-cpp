@@ -1,0 +1,6 @@
+a.out
+*.exe
+*.obj
+*.out
+IGNORE.*
+old teststuff
