@@ -1,2 +1,2 @@
-#klib in c++
-This is a c++ class library.
+# klib in c++
+This is a c++ class library thing.
