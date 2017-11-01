@@ -12,14 +12,24 @@
 
 using namespace std;
 
-void print(string txt)
-{
-    cout << txt << endl;
-}
-void prints(string txt)
-{
-    cout << txt;
-}
+class Converter {
+public:
+    //Converter() {}
+    //virtual ~Converter() {}
+
+    // Converts integerts into char arrays
+    static const char *intToArray(int x) {
+        std::string s = std::to_string(x);
+        const char *num = s.c_str();
+        return num;
+    }
+    static const char *stringToArray(std::string x) {
+        return x.c_str();
+    }
+    static std::string intToString(int x) {
+        return std::to_string(x);
+    }
+};
 
 class vars
 {

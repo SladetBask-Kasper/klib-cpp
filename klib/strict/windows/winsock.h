@@ -597,3 +597,130 @@ public:
         return true;
     }
 };
+
+///
+/// An accual socket class
+///
+class a_sock
+{
+private:
+    const char *intToArray(int x) {
+        std::string s = std::to_string(x);
+        const char *portNumber = s.c_str();
+        return portNumber;
+    }
+
+    SOCKET userSocket = INVALID_SOCKET;
+public:
+    /// Connect.
+    a_sock(std::string ip_addr, int port = 80) {
+
+        const char *portNumber = intToArray(port);
+        const char* Server_IP_Address = ip_addr.c_str();
+
+        int iResult;
+        WSADATA wsaData;
+        struct addrinfo *result = NULL, *ptr = NULL, hints;
+
+        ZeroMemory( &hints, sizeof(hints) );
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = IPPROTO_TCP;
+
+        // Initialize Winsock
+        iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+        if (iResult != 0) {
+            printf("WSAStartup failed: %d\n", iResult);
+            return;
+        }
+
+        // Resolve the server address and port
+        iResult = getaddrinfo(Server_IP_Address, portNumber, &hints, &result);
+        if (iResult != 0) {
+            printf("getaddrinfo failed: %d\n", iResult);
+            WSACleanup();
+            return;
+        }
+
+        SOCKET ConnectSocket = INVALID_SOCKET;
+        ptr=result;
+        // Create a SOCKET for connecting to server
+        ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+
+        if (ConnectSocket == INVALID_SOCKET) {
+            printf("Error at socket(): %ld\n", WSAGetLastError());
+            freeaddrinfo(result);
+            WSACleanup();
+            return;
+        }
+
+        // Connect to server.
+        iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            closesocket(ConnectSocket);
+            ConnectSocket = INVALID_SOCKET;
+        }
+
+        freeaddrinfo(result);
+
+        // Socket Connection error
+        if (ConnectSocket == INVALID_SOCKET) {
+            printf("Unable to connect to server!\n");
+            WSACleanup();
+            return;
+        }
+
+        userSocket = ConnectSocket;
+    }
+    bool Send(std::string sendString = "DEFAULT_SEND_MESSAGE") {
+
+        const char* sendbuf = sendString.c_str();
+        SOCKET ConnectSocket = userSocket;
+
+        if (ConnectSocket == INVALID_SOCKET) {
+            cout << "[ERROR][SOCKET IS INVALID]" << endl;
+            return false;
+        }
+
+        int iResult;
+        WSADATA wsaData;
+        struct addrinfo *result = NULL, *ptr = NULL, hints;
+        int recvbuflen = DEFAULT_BUFLEN;
+        char recvbuf[DEFAULT_BUFLEN];
+
+        // Send an initial buffer
+        iResult = send(ConnectSocket, sendbuf, (int) strlen(sendbuf), 0);
+        if (iResult == SOCKET_ERROR) {
+            printf("send failed: %d\n", WSAGetLastError());
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return false;
+        }
+
+        printf("Bytes Sent: %ld\n", iResult);
+
+        // shutdown the connection for sending since no more data will be sent
+        // the client can still use the ConnectSocket for receiving data
+        iResult = shutdown(ConnectSocket, SD_SEND);
+        if (iResult == SOCKET_ERROR) {
+            printf("shutdown failed: %d\n", WSAGetLastError());
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return false;
+        }
+
+        // Receive data until the server closes the connection
+        do {
+            iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+            if (iResult > 0)
+                printf("Bytes received: %d\n", iResult);
+            else if (iResult == 0)
+                cout << ""; // Do nothing! //printf("Connection closed\n"); // only means we got all the data back
+            else
+                printf("recv failed: %d\n", WSAGetLastError());
+        } while (iResult > 0);
+
+        return true;
+    }
+    virtual ~a_sock() {};
+};
