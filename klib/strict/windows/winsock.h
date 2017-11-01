@@ -519,7 +519,7 @@ public:
             printf("send failed: %d\n", WSAGetLastError());
             closesocket(ConnectSocket);
             WSACleanup();
-            return 1;
+            return false;
         }
 
         printf("Bytes Sent: %ld\n", iResult);
@@ -531,7 +531,7 @@ public:
             printf("shutdown failed: %d\n", WSAGetLastError());
             closesocket(ConnectSocket);
             WSACleanup();
-            return 1;
+            return false;
         }
 
         // Receive data until the server closes the connection
@@ -568,7 +568,7 @@ public:
             printf("send failed: %d\n", WSAGetLastError());
             closesocket(ConnectSocket);
             WSACleanup();
-            return 1;
+            return false;
         }
 
         printf("Bytes Sent: %ld\n", iResult);
@@ -580,7 +580,7 @@ public:
             printf("shutdown failed: %d\n", WSAGetLastError());
             closesocket(ConnectSocket);
             WSACleanup();
-            return 1;
+            return false;
         }
 
         // Receive data until the server closes the connection

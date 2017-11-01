@@ -4,3 +4,5 @@ a.out
 *.out
 IGNORE.*
 old teststuff
+*.test.cpp
+*.pyc
