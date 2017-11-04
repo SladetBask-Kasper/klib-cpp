@@ -91,15 +91,6 @@ public:
         char       buf[80];
         tstruct = *localtime(&now);
 
-        // <<  Ad  >>
-        // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime (can be a virus website or not for all I know)
-        // for more information about date/time format
-        // << /Ad >>
-        // <KLIB DEV: > This was left here from an answer on stack overflow.
-        // Some old post from 8 years ago (like 2012 or something)
-
-
-        //strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct); // Answer original. Gets Year, Day, Everything...
         strftime(buf, sizeof(buf), "%X", &tstruct);
         return buf;
     }

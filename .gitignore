@@ -4,5 +4,7 @@ a.out
 *.out
 IGNORE.*
 old teststuff
-*.test.cpp
+*.test.*
+*.debug.*
 *.pyc
+__pycache__
