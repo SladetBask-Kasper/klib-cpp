@@ -14,8 +14,6 @@ using namespace std;
 
 class Converter {
 public:
-    //Converter() {}
-    //virtual ~Converter() {}
 
     // Converts integerts into char arrays
     static const char *intToArray(int x) {

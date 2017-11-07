@@ -25,7 +25,6 @@
 #define FTP_PORT 21
 #define SMTP_PORT 25
 
-
 class tasks_winsocket {
 private:
     static const char *intToArray(int x) {

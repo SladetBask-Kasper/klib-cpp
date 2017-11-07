@@ -6,5 +6,6 @@ IGNORE.*
 old teststuff
 *.test.*
 *.debug.*
+*.ignore.*
 *.pyc
 __pycache__
