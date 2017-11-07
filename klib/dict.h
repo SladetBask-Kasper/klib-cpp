@@ -5,6 +5,8 @@
     Please don't remove my name from this file, Thanks!
 
 */
+#ifndef DICT_H
+#define DICT_H
 #pragma once
 #include <iostream>
 #include <string>
@@ -242,3 +244,5 @@ std::string dict::scanAndFixBrokenBlocks() {
 
     return blockInfo;
 }
+
+#endif // DICT_H

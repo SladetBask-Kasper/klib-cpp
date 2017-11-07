@@ -1,3 +1,5 @@
+#ifndef WINSOCK_H
+#define WINSOCK_H
 #pragma once
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -558,3 +560,5 @@ public:
     }
     virtual ~a_sock() {};
 };
+
+#endif WINSOCK_H
