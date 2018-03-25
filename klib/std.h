@@ -1,7 +1,6 @@
 #ifndef STD_H
 #define STD_H
 
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -30,6 +29,9 @@ public:
     }
     static std::string intToString(int x) {
         return std::to_string(x);
+    }
+    static int stringToInt(std::string x) {
+        return atoi( x.c_str() )
     }
 };
 
