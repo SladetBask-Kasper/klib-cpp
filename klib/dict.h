@@ -1,6 +1,7 @@
 /*
 
     This dict (dictionary) class is written by "Kasper - Sladetbask" on github.
+    (https://github.com/SladetBask-Kasper/)
     Anyone editing this code can feel free to add there name.
     Please don't remove my name from this file, Thanks!
 
@@ -10,13 +11,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "exceptions.h"
 
-#define DEL_KEY       "::{D_V"
-#define DEFUALT_VALUE "FORNOWEMPTYVALUE"
-
-
-using namespace std;
+#define DICT_GET_ERROR "Get Error (from dict)"
 
 /*
 
@@ -24,65 +20,56 @@ using namespace std;
     The class is writen on windows but should work on any platform!
 
     [HOW IT WORKS]
-    It takes two vectors (vector: basicly an array) and assings a value and a name two each vector,
+    It takes two vectors and assings a value and a name two each vector,
     then when it trys to get the vectors value, because we assign a value and refrence name at the same time,
     the refrence name and value have the same index!
 
     [FOR PEOPLE WHO WILL READ THE SOURCE CODE]
     refrence = the vector with names
-    value    = Is in most cases the content of the dict.
+    value    = Is in most cases the content of the dict. (Edit: What do I mean "most cases?")
 
 */
 class dict {
 protected:
-    std::vector<string> mainVector;
-    std::vector<string> refrenceVector;
-
-    std::string removeSpaces(std::string input)
-    {
-        input.erase(std::remove(input.begin(), input.end(), ' '),input.end());
-        return input;
-    }
-
+    std::vector<std::string> mainVector;
+    std::vector<std::string> refrenceVector;
 public:
-    void append(string, string);
-    dict (string, string);
-    virtual ~dict () {};
+    bool append(std::string, std::string);
+    dict(std::string, std::string);
+    dict();
+    virtual ~dict() {};
 
-
-    int scanIndex(string);
-    std::string get(string);
-    std::string removeValue(string);
-    std::string changeValue(string, string);
+    int scanIndex(std::string);
+    std::string get(std::string);
+    std::vector<std::string> get(int pos);
+    size_t length();
+    size_t size();
+    bool removeValue(std::string);
+    bool changeValue(std::string, std::string);
+    bool isValue(std::string allocName);
     bool isEmpty();
-    std::string move(string, string);
-    std::string scanAndFixBrokenBlocks();
+    bool move(std::string, std::string);
 
 };
 
 /*
     constructor...
 */
-dict::dict(string allocName, string content) {
-
+dict::dict(std::string allocName, std::string content) {
     append(allocName, content);
 }
+dict::dict() {}
 
 /*
     Appends to the vectors
     adding the refrence along with its value
 */
-void dict::append(string allocName, string content) {
+bool dict::append(std::string allocName, std::string content) {
 
-    if (allocName == STD_CALL_ERROR || content == STD_CALL_ERROR || allocName == DEL_KEY || content == DEL_KEY) {
-        cout << "ERROR: INVALID VALUES. PLEASE CHECK VALUES OF \"DEL_KEY\" AND \"STD_CALL_ERROR\"" << endl;
-        return;
-    }
     if (!refrenceVector.empty()) {
         for (int i = 0; i < refrenceVector.size(); i++) {
             if (refrenceVector[i] == allocName) {
-                cout << "TWO NAMES CANNOT BE THE SAME" << endl;
-                return;
+                return false;
             }
         }
     }
@@ -91,12 +78,13 @@ void dict::append(string allocName, string content) {
     mainVector.push_back(content);
     refrenceVector.push_back(allocName);
 
+    return true;
 }
 
 /*
     scans for the value, getting the index value!
 */
-int dict::scanIndex(string valueToScanFor) {
+int dict::scanIndex(std::string valueToScanFor) {
     for (int i = 0; i < refrenceVector.size(); i++) {
         if (refrenceVector[i] == valueToScanFor) {
             return i;
@@ -108,18 +96,29 @@ int dict::scanIndex(string valueToScanFor) {
 /*
     Gets the value of refrence
 */
-std::string dict::get(string allocName) {
-
-    if (allocName == DEL_KEY) {
-        cout << "ERROR: ACCESSING DELETED VARIABLES IS NOT ALLOWED" << endl;
-        return STD_CALL_ERROR;
-    }
+std::string dict::get(std::string allocName) {
 
     int callIndex = scanIndex(allocName);
     if (callIndex == -1) {
-        return STD_CALL_ERROR;
+        return DICT_GET_ERROR;
     }
     return mainVector[callIndex];
+}
+std::vector<std::string> dict::get(int pos) {
+    std::vector<std::string> rv;
+    rv.push_back(refrenceVector[pos]);
+    rv.push_back(mainVector[pos]);
+    return rv;
+}
+
+/*
+    Gets length of vector
+*/
+size_t dict::length() {
+    return refrenceVector.size();
+}
+size_t dict::size() {
+    return this->length(); // couldn't decide what to call it so..
 }
 
 /*
@@ -128,20 +127,26 @@ std::string dict::get(string allocName) {
 
 */
 
-std::string dict::removeValue(string allocName) {
+bool dict::removeValue(std::string allocName) {
     int callIndex = scanIndex(allocName);
     if (callIndex == -1) {
-        return STD_CALL_ERROR;
+        return false;
     }
 
-    // <OLD>
-    //mainVector[callIndex]     = DEL_KEY;
-    //refrenceVector[callIndex] = DEL_KEY;
-    // </OLD>
     mainVector.erase(mainVector.begin() + callIndex);
     refrenceVector.erase(refrenceVector.begin() + callIndex);
 
-    return "s";
+    return true;
+}
+
+/*
+
+    Checks if value exists.
+
+*/
+
+bool dict::isValue(std::string allocName) {
+    return (scanIndex(allocName) != -1);
 }
 
 /*
@@ -158,15 +163,15 @@ bool dict::isEmpty() {
     Allows you to change the value of a refrence
 
 */
-string dict::changeValue(string fromNAME, string toCONTENT) {
-    int id  = scanIndex(fromNAME);
+bool dict::changeValue(std::string fromNAME, std::string toCONTENT) {
+    int id = scanIndex(fromNAME);
 
     if (id == -1) {
-        return VALUE_DOES_NOT_EXIST;
+        return false;
     }
 
     mainVector[id] = toCONTENT;
-    return SUCCESS;
+    return true;
 }
 
 /*
@@ -174,71 +179,29 @@ string dict::changeValue(string fromNAME, string toCONTENT) {
     Moves the value from a refrence to another
 
 */
-string dict::move(string fromNAME, string toNAME) {
+bool dict::move(std::string fromNAME, std::string toNAME) {
 
-    int id  = scanIndex(fromNAME);
+    int id = scanIndex(fromNAME);
     int id2 = scanIndex(toNAME);
 
-    string flags = "";
+    std::string flags = "";
 
     if (id == -1) {
-        return VALUE_DOES_NOT_EXIST;
+        return false;
     }
     if (id2 == -1) {
         flags = flags + "MAKENEW ";
     }
 
-    if (flags.find("MAKENEW") != string::npos) {
+    if (flags.find("MAKENEW") != std::string::npos) {
         // if we gonna make new
         append(toNAME, mainVector[id]);// id = fromNAME id
-        return SUCCESS;
+        return true;
     }
     else {
         // or not
         refrenceVector[id] = mainVector[id2];
-        return SUCCESS;
+        return true;
     }
 
-}
-std::string dict::scanAndFixBrokenBlocks() {
-
-    bool brokenBlockIndicator1;
-    bool brokenBlockIndicator2;
-    bool brokenBlockIndicator3;
-    bool brokenBlockIndicator_INMAIN1;
-    bool brokenBlockIndicator_INMAIN2;
-    bool brokenBlockIndicator_INMAIN3;
-    string blockInfo = "";
-    string noSpacesIndicator;
-    string noSpacesIndicator_INMAIN;
-
-    for (int i = 0; i < refrenceVector.size(); i++) {
-
-        noSpacesIndicator = removeSpaces(refrenceVector[i]);
-        noSpacesIndicator_INMAIN = removeSpaces(mainVector[i]);
-        //cout << "NOSPACE : \"" << noSpacesIndicator << "\"" << endl;
-        //cout << "NOSPACE : \"" << noSpacesIndicator_INMAIN << "\"" << endl;
-
-        brokenBlockIndicator1 = noSpacesIndicator == "";
-        brokenBlockIndicator2 = refrenceVector[i] == DEL_KEY;
-        brokenBlockIndicator3 = refrenceVector[i] == DEFUALT_VALUE;
-        brokenBlockIndicator_INMAIN1 = noSpacesIndicator_INMAIN == "";
-        brokenBlockIndicator_INMAIN2 = mainVector[i] == DEL_KEY;
-        brokenBlockIndicator_INMAIN3 = mainVector[i] == DEFUALT_VALUE;
-
-        if (brokenBlockIndicator1 || brokenBlockIndicator2 || brokenBlockIndicator3 || brokenBlockIndicator_INMAIN1 || brokenBlockIndicator_INMAIN2 || brokenBlockIndicator_INMAIN3) {
-
-            blockInfo = blockInfo + "DETECTED:" + refrenceVector[i] + "! ... ";
-
-            //refrenceVector.erase(refrenceVector.begin() + i);
-            //mainVector.erase(mainVector.begin() + i);
-
-
-            blockInfo = blockInfo + removeValue(mainVector[i]) + " ... ";
-            blockInfo = blockInfo + removeValue(refrenceVector[i]) + "\n";
-
-        }
-    }
-
-    return blockInfo;
 }
